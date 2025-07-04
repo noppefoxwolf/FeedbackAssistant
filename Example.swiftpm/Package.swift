@@ -41,7 +41,8 @@ let package = Package(
         .executableTarget(
             name: "AppModule",
             dependencies: [
-                .product(name: "FeedbackAssistant", package: "feedbackassistant")
+                .product(name: "FeedbackAssistant", package: "feedbackassistant"),
+                .product(name: "FeedbackAssistantUI", package: "feedbackassistant")
             ],
             path: "."
         )
