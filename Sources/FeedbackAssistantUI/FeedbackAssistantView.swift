@@ -24,16 +24,12 @@ public struct FeedbackAssistantView: View {
         NavigationView {
             List {
                 Section("Basic Information") {
-                    VStack(alignment: .leading, content: {
-                        Text("Enter a title that describes your feedback", bundle: .module)
-                        
-                        TextField(
-                            "",
-                            text: $issue.title,
-                            prompt: Text("Unable to make phone calls from lock screen", bundle: .module),
-                            axis: .vertical
-                        )
-                    })
+                    FormFieldView(
+                        title: "Enter a title that describes your feedback",
+                        placeholder: "Example: Cannot make calls from lock screen",
+                        text: $issue.title,
+                        axis: .vertical
+                    )
                     
                     Picker("Feedback Type", selection: $issue.type) {
                         ForEach(FeedbackType.allCases, id: \.self) { type in
@@ -44,16 +40,12 @@ public struct FeedbackAssistantView: View {
                 }
                 
                 Section("Description") {
-                    VStack(alignment: .leading, content: {
-                        Text("Please enter the problem and steps to reproduce it", bundle: .module)
-                        
-                        TextField(
-                            "",
-                            text: $issue.description,
-                            prompt: Text("Please include the following:\n- Clear description of the problem\n- Step-by-step instructions to reproduce the issue (if possible)\n- Expected result\n- Actual result observed", bundle: .module),
-                            axis: .vertical
-                        )
-                    })
+                    FormFieldView(
+                        title: "Please enter the problem and steps to reproduce it",
+                        placeholder: "Describe the problem, steps to reproduce, expected and actual results",
+                        text: $issue.description,
+                        axis: .vertical
+                    )
                 }
                 
                 Section("Attachments") {
