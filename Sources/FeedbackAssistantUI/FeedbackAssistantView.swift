@@ -81,13 +81,13 @@ public struct FeedbackAssistantView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(Text("Close", bundle: .module)) {
+                    Button("Close") {
                         dismiss()
                     }
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(Text("Submit", bundle: .module)) {
+                    Button("Submit") {
                         Task {
                             await submitFeedback()
                         }
