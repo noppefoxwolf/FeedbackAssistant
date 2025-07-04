@@ -20,7 +20,7 @@ struct ContentView: View {
         .sheet(isPresented: $showingFeedback) {
             FeedbackAssistantView(
                 submissionHandler: MockFeedbackSubmissionHandler(),
-                issueBuilder: createIssueBuilder()
+                initialIssue: createIssueWithScreenshot()
             )
         }
     }
@@ -29,11 +29,32 @@ struct ContentView: View {
         showingFeedback = true
     }
     
-    private func createIssueBuilder() -> IssueBuilder {
-        let builder = IssueBuilder()
-        builder.addModule(ScreenshotCaptureModule())
-        builder.addModule(ViewHierarchyCaptureModule())
-        return builder
+    private func createIssueWithScreenshot() -> Issue {
+        guard let screenshot = captureScreenshot() else {
+            return Issue()
+        }
+        
+        let attachment = Attachment(
+            name: "screenshot_\(Date().timeIntervalSince1970).png",
+            data: screenshot,
+            contentType: .png
+        )
+        
+        return Issue(attachments: [attachment])
+    }
+    
+    private func captureScreenshot() -> Data? {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else {
+            return nil
+        }
+        
+        let renderer = UIGraphicsImageRenderer(bounds: window.bounds)
+        let image = renderer.image { context in
+            window.layer.render(in: context.cgContext)
+        }
+        
+        return image.pngData()
     }
 }
 

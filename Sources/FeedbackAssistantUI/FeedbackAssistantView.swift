@@ -17,22 +17,11 @@ public struct FeedbackAssistantView: View {
     public init(
         submissionHandler: FeedbackSubmissionProtocol,
         delegate: FeedbackSubmissionDelegate? = nil,
-        issueBuilder: IssueBuilder? = nil
+        initialIssue: Issue = Issue()
     ) {
         self.submissionHandler = submissionHandler
         self.delegate = delegate
-        
-        if let issueBuilder = issueBuilder {
-            self._issue = State(initialValue: Issue())
-            Task {
-                let builtIssue = await issueBuilder.buildIssue()
-                await MainActor.run {
-                    self.issue = builtIssue
-                }
-            }
-        } else {
-            self._issue = State(initialValue: Issue())
-        }
+        self._issue = State(initialValue: initialIssue)
     }
     
     public var body: some View {
@@ -207,14 +196,6 @@ struct AttachmentPreviewView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if attachment.isText, let text = String(data: attachment.data, encoding: .utf8) {
-                    ScrollView {
-                        Text(text)
-                            .font(.system(.body, design: .monospaced))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding()
-                    }
-                    .background(Color(.systemBackground))
                 } else {
                     VStack(spacing: 20) {
                         Image(systemName: "doc.text")
@@ -231,7 +212,7 @@ struct AttachmentPreviewView: View {
                     }
                 }
             }
-            .background(attachment.isImage ? Color.black : Color(.systemBackground))
+            .background(Color.black)
             .navigationTitle(attachment.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
