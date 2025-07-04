@@ -12,7 +12,7 @@ struct ContentView: View {
                 .foregroundColor(.accentColor)
             Text("Hello, world!")
             
-            Button("Show Feedback") {
+            Button("Send Feedback") {
                 captureScreenshotAndShowFeedback()
             }
             .buttonStyle(.borderedProminent)
@@ -55,5 +55,12 @@ struct ContentView: View {
         }
         
         return image.pngData()
+    }
+}
+
+struct MockFeedbackSubmissionHandler: FeedbackSubmissionProtocol {
+    func submitFeedback(_ issue: Issue) async throws {
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        print("Mock submission: \(issue.title)")
     }
 }
