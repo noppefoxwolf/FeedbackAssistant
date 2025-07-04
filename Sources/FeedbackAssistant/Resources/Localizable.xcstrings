@@ -1,0 +1,21 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Bug Report" : {
+      "comment" : "Bug report feedback type"
+    },
+    "Feature Request" : {
+      "comment" : "Feature request feedback type"
+    },
+    "Other" : {
+      "comment" : "Other feedback type"
+    },
+    "Performance Issue" : {
+      "comment" : "Performance issue feedback type"
+    },
+    "Usability Issue" : {
+      "comment" : "Usability issue feedback type"
+    }
+  },
+  "version" : "1.0"
+}
