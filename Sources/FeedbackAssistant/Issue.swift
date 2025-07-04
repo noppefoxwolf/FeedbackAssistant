@@ -8,18 +8,7 @@ public enum FeedbackType: String, CaseIterable, Codable, Sendable {
     case other = "Other"
     
     public var localizedTitle: String {
-        switch self {
-        case .bug:
-            return NSLocalizedString("Bug Report", bundle: .module, comment: "Bug report feedback type")
-        case .featureRequest:
-            return NSLocalizedString("Feature Request", bundle: .module, comment: "Feature request feedback type")
-        case .performance:
-            return NSLocalizedString("Performance Issue", bundle: .module, comment: "Performance issue feedback type")
-        case .usability:
-            return NSLocalizedString("Usability Issue", bundle: .module, comment: "Usability issue feedback type")
-        case .other:
-            return NSLocalizedString("Other", bundle: .module, comment: "Other feedback type")
-        }
+        return rawValue
     }
 }
 
