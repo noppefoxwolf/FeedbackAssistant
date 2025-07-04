@@ -6,6 +6,10 @@ public struct FeedbackAssistantView: View {
     private var dismiss
     @State private var issue: Issue
     @State private var isSubmitting = false
+    @State private var showingImagePicker = false
+    @State private var showingDocumentPicker = false
+    @State private var showingActionSheet = false
+    @State private var selectedAttachment: Attachment?
     
     private let submissionHandler: FeedbackSubmissionProtocol
     private weak var delegate: FeedbackSubmissionDelegate?
@@ -50,7 +54,7 @@ public struct FeedbackAssistantView: View {
                 
                 Section("Attachments") {
                     Button("Add Attachment") {
-                        addAttachment()
+                        showingActionSheet = true
                     }
                     
                     ForEach(issue.attachments) { attachment in
@@ -81,12 +85,15 @@ public struct FeedbackAssistantView: View {
                             }
                             
                             Spacer()
-                            
-                            Button("Remove") {
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            selectedAttachment = attachment
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button("Delete", role: .destructive) {
                                 removeAttachment(attachment)
                             }
-                            .font(.caption)
-                            .foregroundColor(.red)
                         }
                     }
                 }
@@ -109,6 +116,50 @@ public struct FeedbackAssistantView: View {
                     .disabled(issue.title.isEmpty || issue.description.isEmpty || isSubmitting)
                 }
             }
+            .confirmationDialog("Add Attachment", isPresented: $showingActionSheet) {
+                Button("Photo Library") {
+                    showingImagePicker = true
+                }
+                Button("Files") {
+                    showingDocumentPicker = true
+                }
+                Button("Cancel", role: .cancel) {}
+            }
+            .sheet(isPresented: $showingImagePicker) {
+                ImagePicker { image in
+                    if let imageData = image.pngData() {
+                        let attachment = Attachment(
+                            name: "image_\(Date().timeIntervalSince1970).png",
+                            data: imageData,
+                            contentType: .png
+                        )
+                        issue.addAttachment(attachment)
+                    }
+                }
+            }
+            .sheet(isPresented: $showingDocumentPicker) {
+                DocumentPicker { url in
+                    do {
+                        let data = try Data(contentsOf: url)
+                        let name = url.lastPathComponent
+                        let contentType = UTType(filenameExtension: url.pathExtension) ?? .data
+                        
+                        let attachment = Attachment(
+                            name: name,
+                            data: data,
+                            contentType: contentType
+                        )
+                        issue.addAttachment(attachment)
+                    } catch {
+                        print("Error loading file: \(error)")
+                    }
+                }
+            }
+            .fullScreenCover(item: $selectedAttachment) { attachment in
+                AttachmentPreviewView(attachment: attachment) {
+                    selectedAttachment = nil
+                }
+            }
         }
     }
     
@@ -127,19 +178,121 @@ public struct FeedbackAssistantView: View {
         }
     }
     
-    private func addAttachment() {
-        // TODO: Implement file picker
-        let mockData = "Mock file content".data(using: .utf8) ?? Data()
-        let mockAttachment = Attachment(
-            name: "attachment_\(issue.attachments.count + 1).txt",
-            data: mockData,
-            contentType: .text
-        )
-        issue.addAttachment(mockAttachment)
-    }
     
     private func removeAttachment(_ attachment: Attachment) {
         issue.removeAttachment(attachment)
+    }
+}
+
+struct AttachmentPreviewView: View {
+    let attachment: Attachment
+    let onDismiss: () -> Void
+    
+    var body: some View {
+        NavigationView {
+            VStack {
+                if attachment.isImage, let uiImage = UIImage(data: attachment.data) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    VStack(spacing: 20) {
+                        Image(systemName: "doc.text")
+                            .font(.system(size: 80))
+                            .foregroundColor(.secondary)
+                        
+                        Text(attachment.name)
+                            .font(.title2)
+                            .multilineTextAlignment(.center)
+                        
+                        Text(attachment.fileSize)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            .background(Color.black)
+            .navigationTitle(attachment.name)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        onDismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+import UIKit
+import UniformTypeIdentifiers
+
+struct ImagePicker: UIViewControllerRepresentable {
+    let onImageSelected: (UIImage) -> Void
+    
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.delegate = context.coordinator
+        picker.sourceType = .photoLibrary
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        let parent: ImagePicker
+        
+        init(_ parent: ImagePicker) {
+            self.parent = parent
+        }
+        
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let image = info[.originalImage] as? UIImage {
+                parent.onImageSelected(image)
+            }
+            picker.dismiss(animated: true)
+        }
+        
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            picker.dismiss(animated: true)
+        }
+    }
+}
+
+struct DocumentPicker: UIViewControllerRepresentable {
+    let onDocumentSelected: (URL) -> Void
+    
+    func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.item])
+        picker.delegate = context.coordinator
+        picker.allowsMultipleSelection = false
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: UIDocumentPickerViewController, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, UIDocumentPickerDelegate {
+        let parent: DocumentPicker
+        
+        init(_ parent: DocumentPicker) {
+            self.parent = parent
+        }
+        
+        func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+            if let url = urls.first {
+                parent.onDocumentSelected(url)
+            }
+        }
     }
 }
 

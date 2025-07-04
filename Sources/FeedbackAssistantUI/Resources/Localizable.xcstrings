@@ -45,6 +45,9 @@
         }
       }
     },
+    "Cancel" : {
+
+    },
     "Close" : {
       "localizations" : {
         "ja" : {
@@ -54,6 +57,9 @@
           }
         }
       }
+    },
+    "Delete" : {
+
     },
     "Describe the problem, steps to reproduce, expected and actual results" : {
       "localizations" : {
@@ -74,6 +80,9 @@
           }
         }
       }
+    },
+    "Done" : {
+
     },
     "Enter a title that describes your feedback" : {
       "localizations" : {
@@ -126,6 +135,9 @@
         }
       }
     },
+    "Files" : {
+
+    },
     "Other" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -148,6 +160,9 @@
         }
       }
     },
+    "Photo Library" : {
+
+    },
     "Please enter the problem and steps to reproduce it" : {
       "localizations" : {
         "ja" : {
@@ -159,6 +174,7 @@
       }
     },
     "Remove" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
