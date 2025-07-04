@@ -1,0 +1,45 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Add Attachment" : {
+
+    },
+    "Attachments" : {
+
+    },
+    "Basic Information" : {
+
+    },
+    "Close" : {
+
+    },
+    "Description" : {
+
+    },
+    "Enter a title that describes your feedback" : {
+
+    },
+    "Feedback" : {
+
+    },
+    "Feedback Type" : {
+
+    },
+    "Please enter the problem and steps to reproduce it" : {
+
+    },
+    "Please include the following:\n- Clear description of the problem\n- Step-by-step instructions to reproduce the issue (if possible)\n- Expected result\n- Actual result observed" : {
+
+    },
+    "Remove" : {
+
+    },
+    "Submit" : {
+
+    },
+    "Unable to make phone calls from lock screen" : {
+
+    }
+  },
+  "version" : "1.0"
+}
