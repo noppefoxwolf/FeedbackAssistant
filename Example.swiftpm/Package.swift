@@ -10,7 +10,7 @@ import AppleProductTypes
 let package = Package(
     name: "Example",
     platforms: [
-        .iOS("16.0")
+        .iOS("17.0")
     ],
     products: [
         .iOSApplication(
@@ -41,8 +41,7 @@ let package = Package(
         .executableTarget(
             name: "AppModule",
             dependencies: [
-                .product(name: "FeedbackAssistant", package: "feedbackassistant"),
-                .product(name: "FeedbackAssistantUI", package: "feedbackassistant")
+                .product(name: "FeedbackAssistant", package: "FeedbackAssistant")
             ],
             path: "."
         )
