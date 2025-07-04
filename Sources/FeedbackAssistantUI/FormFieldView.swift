@@ -24,6 +24,7 @@ struct FormFieldView: View {
                 .font(.subheadline)
                 .fontWeight(.bold)
                 .foregroundColor(.primary)
+                .lineLimit(0)
             
             TextField(
                 "",

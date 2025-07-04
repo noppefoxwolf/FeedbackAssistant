@@ -33,7 +33,7 @@ public struct FeedbackAssistantView: View {
                     
                     Picker("Feedback Type", selection: $issue.type) {
                         ForEach(FeedbackType.allCases, id: \.self) { type in
-                            Text(type.rawValue).tag(type)
+                            Text(type.localizedTitle).tag(type)
                         }
                     }
                     .pickerStyle(MenuPickerStyle())
@@ -53,13 +53,35 @@ public struct FeedbackAssistantView: View {
                         addAttachment()
                     }
                     
-                    ForEach(issue.attachments, id: \.self) { attachment in
+                    ForEach(issue.attachments) { attachment in
                         HStack {
-                            Image(systemName: "paperclip")
-                                .foregroundColor(.secondary)
-                            Text(attachment)
-                                .font(.caption)
+                            if attachment.isImage, let uiImage = UIImage(data: attachment.data) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 40, height: 40)
+                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                            } else {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 40, height: 40)
+                                    .overlay(
+                                        Image(systemName: attachment.isImage ? "photo" : "doc")
+                                            .foregroundColor(.secondary)
+                                    )
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(attachment.name)
+                                    .font(.caption)
+                                    .lineLimit(1)
+                                Text(attachment.fileSize)
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+                            
                             Spacer()
+                            
                             Button("Remove") {
                                 removeAttachment(attachment)
                             }
@@ -107,11 +129,16 @@ public struct FeedbackAssistantView: View {
     
     private func addAttachment() {
         // TODO: Implement file picker
-        let mockAttachment = "attachment_\(issue.attachments.count + 1).txt"
+        let mockData = "Mock file content".data(using: .utf8) ?? Data()
+        let mockAttachment = Attachment(
+            name: "attachment_\(issue.attachments.count + 1).txt",
+            data: mockData,
+            contentType: .text
+        )
         issue.addAttachment(mockAttachment)
     }
     
-    private func removeAttachment(_ attachment: String) {
+    private func removeAttachment(_ attachment: Attachment) {
         issue.removeAttachment(attachment)
     }
 }
@@ -129,7 +156,14 @@ struct MockFeedbackSubmissionHandler: FeedbackSubmissionProtocol {
         initialIssue: Issue(
             title: "Example Issue",
             description: "This is a pre-filled issue for testing",
-            type: .bug
+            type: .bug,
+            attachments: [
+                Attachment(
+                    name: "screenshot.png",
+                    data: Data(),
+                    contentType: .png
+                )
+            ]
         )
     )
 }

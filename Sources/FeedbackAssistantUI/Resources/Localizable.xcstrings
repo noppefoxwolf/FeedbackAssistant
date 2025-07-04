@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "Add Attachment" : {
 
     },
@@ -13,10 +16,16 @@
     "Close" : {
 
     },
+    "Describe the problem, steps to reproduce, expected and actual results" : {
+
+    },
     "Description" : {
 
     },
     "Enter a title that describes your feedback" : {
+
+    },
+    "Example: Cannot make calls from lock screen" : {
 
     },
     "Feedback" : {
@@ -28,16 +37,10 @@
     "Please enter the problem and steps to reproduce it" : {
 
     },
-    "Please include the following:\n- Clear description of the problem\n- Step-by-step instructions to reproduce the issue (if possible)\n- Expected result\n- Actual result observed" : {
-
-    },
     "Remove" : {
 
     },
     "Submit" : {
-
-    },
-    "Unable to make phone calls from lock screen" : {
 
     }
   },
