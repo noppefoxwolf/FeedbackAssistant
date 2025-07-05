@@ -42,7 +42,6 @@
       }
     },
     "Basic Information" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
