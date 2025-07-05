@@ -52,6 +52,19 @@ public struct FeedbackAssistantView: View {
                     )
                 }
                 
+                Section("System Information") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        SystemInfoRow(label: "App Version", value: issue.systemInfo.appVersion)
+                        SystemInfoRow(label: "Build Number", value: issue.systemInfo.appBuildNumber)
+                        SystemInfoRow(label: "Bundle ID", value: issue.systemInfo.bundleIdentifier)
+                        SystemInfoRow(label: "iOS Version", value: issue.systemInfo.systemVersion)
+                        SystemInfoRow(label: "Device Model", value: issue.systemInfo.deviceModel)
+                        SystemInfoRow(label: "Device Name", value: issue.systemInfo.deviceName)
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                }
+                
                 Section("Attachments") {
                     Button("Add Attachment") {
                         showingActionSheet = true
@@ -123,6 +136,9 @@ public struct FeedbackAssistantView: View {
                 Button("Files") {
                     showingDocumentPicker = true
                 }
+                Button("View Hierarchy") {
+                    attachViewHierarchy()
+                }
                 Button("Cancel", role: .cancel) {}
             }
             .sheet(isPresented: $showingImagePicker) {
@@ -181,6 +197,21 @@ public struct FeedbackAssistantView: View {
     
     private func removeAttachment(_ attachment: Attachment) {
         issue.removeAttachment(attachment)
+    }
+}
+
+struct SystemInfoRow: View {
+    let label: String
+    let value: String
+    
+    var body: some View {
+        HStack {
+            Text(label)
+                .fontWeight(.medium)
+            Spacer()
+            Text(value)
+                .multilineTextAlignment(.trailing)
+        }
     }
 }
 

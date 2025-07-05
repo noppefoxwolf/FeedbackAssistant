@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
     "Add Attachment" : {
       "localizations" : {
         "ja" : {
@@ -194,6 +191,9 @@
         }
       }
     },
+    "System Information" : {
+
+    },
     "Usability Issue" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -204,6 +204,9 @@
           }
         }
       }
+    },
+    "View Hierarchy" : {
+
     }
   },
   "version" : "1.0"

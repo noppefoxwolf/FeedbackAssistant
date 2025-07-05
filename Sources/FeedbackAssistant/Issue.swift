@@ -1,4 +1,30 @@
 import Foundation
+import UIKit
+
+public struct SystemInfo: Codable, Sendable {
+    public let appVersion: String
+    public let appBuildNumber: String
+    public let bundleIdentifier: String
+    public let deviceModel: String
+    public let deviceName: String
+    public let systemName: String
+    public let createdAt: Date
+    
+    @MainActor
+    public init() {
+        let bundle = Bundle.main
+        self.appVersion = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Unknown"
+        self.appBuildNumber = bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "Unknown"
+        self.bundleIdentifier = bundle.bundleIdentifier ?? "Unknown"
+        
+        let device = UIDevice.current
+        self.systemVersion = device.systemVersion
+        self.deviceModel = device.model
+        self.deviceName = device.name
+        self.systemName = device.systemName
+        self.createdAt = Date()
+    }
+}
 
 public enum FeedbackType: String, CaseIterable, Codable, Sendable {
     case bug = "Bug Report"
@@ -18,15 +44,18 @@ public struct Issue: Codable, Identifiable, Sendable {
     public var description: String
     public var type: FeedbackType
     public var attachments: [Attachment]
+    public let systemInfo: SystemInfo
     public let createdAt: Date
     public var updatedAt: Date
     
+    @MainActor
     public init(
         id: UUID = UUID(),
         title: String = "",
         description: String = "",
         type: FeedbackType = .bug,
         attachments: [Attachment] = [],
+        systemInfo: SystemInfo = SystemInfo(),
         createdAt: Date = Date(),
         updatedAt: Date = Date()
     ) {
@@ -35,6 +64,7 @@ public struct Issue: Codable, Identifiable, Sendable {
         self.description = description
         self.type = type
         self.attachments = attachments
+        self.systemInfo = systemInfo
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }

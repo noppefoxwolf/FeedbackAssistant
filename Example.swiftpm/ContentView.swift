@@ -30,20 +30,20 @@ struct ContentView: View {
     }
     
     private func createIssueWithScreenshot() -> Issue {
-        guard let screenshot = captureScreenshot() else {
-            return Issue()
+        var attachments: [Attachment] = []
+        
+        if let screenshotAttachment = captureScreenshotAttachment() {
+            attachments.append(screenshotAttachment)
         }
         
-        let attachment = Attachment(
-            name: "screenshot_\(Date().timeIntervalSince1970).png",
-            data: screenshot,
-            contentType: .png
-        )
+        if let hierarchyAttachment = viewHierarchyAttachment() {
+            attachments.append(hierarchyAttachment)
+        }
         
-        return Issue(attachments: [attachment])
+        return Issue(attachments: attachments)
     }
     
-    private func captureScreenshot() -> Data? {
+    private func captureScreenshotAttachment() -> Attachment? {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first else {
             return nil
@@ -54,7 +54,31 @@ struct ContentView: View {
             window.layer.render(in: context.cgContext)
         }
         
-        return image.pngData()
+        guard let imageData = image.pngData() else {
+            return nil
+        }
+        
+        return Attachment(
+            name: "screenshot_\(Date().timeIntervalSince1970).png",
+            data: imageData,
+            contentType: .png
+        )
+    }
+    
+    private func viewHierarchyAttachment() -> Attachment? {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else {
+            return nil
+        }
+        
+        let hierarchyDescription = window.perform(Selector(("recursiveDescription")))?.takeUnretainedValue() as? String ?? "Unable to get view hierarchy"
+        let hierarchyData = hierarchyDescription.data(using: String.Encoding.utf8) ?? Data()
+        
+        return Attachment(
+            name: "view_hierarchy_\(Date().timeIntervalSince1970).txt",
+            data: hierarchyData,
+            contentType: .plainText
+        )
     }
 }
 
