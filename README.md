@@ -2,6 +2,8 @@
 
 A comprehensive Swift package for collecting user feedback in iOS apps with rich attachment support and automatic system information collection.
 
+<img src=".github/screenshot.png" width="300" alt="FeedbackAssistant Interface">
+
 ## Features
 
 - 📝 **Easy-to-use feedback collection UI** - Native SwiftUI interface with clean, intuitive design
@@ -269,8 +271,3 @@ MIT License. See [LICENSE](LICENSE) for details.
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Screenshots
-
-![FeedbackAssistant Interface](.github/screenshot.png)
-
-*Modern SwiftUI interface with automatic screenshot capture and system information collection*
