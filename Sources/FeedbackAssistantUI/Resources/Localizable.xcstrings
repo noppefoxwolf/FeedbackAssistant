@@ -11,6 +11,9 @@
         }
       }
     },
+    "App crashes when tapping share" : {
+
+    },
     "App Version" : {
 
     },
@@ -30,17 +33,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "基本情報"
-          }
-        }
-      }
-    },
-    "Bug Report" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "バグレポート"
           }
         }
       }
@@ -67,16 +59,6 @@
     "Delete" : {
 
     },
-    "Describe the problem, steps to reproduce, expected and actual results" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "問題の説明、再現手順、期待される結果、実際の結果を記入してください"
-          }
-        }
-      }
-    },
     "Description" : {
       "localizations" : {
         "ja" : {
@@ -99,27 +81,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "フィードバックを説明するタイトルを入力してください"
-          }
-        }
-      }
-    },
-    "Example: Cannot make calls from lock screen" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "例：ロック画面から電話をかけることができない"
-          }
-        }
-      }
-    },
-    "Feature Request" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "機能要求"
           }
         }
       }
@@ -150,28 +111,6 @@
     "iOS Version" : {
 
     },
-    "Other" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "その他"
-          }
-        }
-      }
-    },
-    "Performance Issue" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "パフォーマンスの問題"
-          }
-        }
-      }
-    },
     "Photo Library" : {
 
     },
@@ -181,17 +120,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "問題とそれを再現するための手順を入力してください"
-          }
-        }
-      }
-    },
-    "Remove" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "削除"
           }
         }
       }
@@ -209,16 +137,8 @@
     "System Information" : {
 
     },
-    "Usability Issue" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ユーザビリティの問題"
-          }
-        }
-      }
+    "Tap share → app crashes" : {
+
     }
   },
   "version" : "1.0"

@@ -98,7 +98,7 @@ public struct FeedbackAssistantView: View {
         Section(String(localized: "Basic Information", bundle: .module)) {
             FormFieldView(
                 title: String(localized: "Enter a title that describes your feedback", bundle: .module),
-                placeholder: String(localized: "Example: Cannot make calls from lock screen", bundle: .module),
+                placeholder: String(localized: "App crashes when tapping share", bundle: .module),
                 text: $viewModel.issue.title,
                 axis: .vertical
             )
@@ -116,7 +116,7 @@ public struct FeedbackAssistantView: View {
         Section(String(localized: "Description", bundle: .module)) {
             FormFieldView(
                 title: String(localized: "Please enter the problem and steps to reproduce it", bundle: .module),
-                placeholder: String(localized: "Describe the problem, steps to reproduce, expected and actual results", bundle: .module),
+                placeholder: String(localized: "Tap share → app crashes", bundle: .module),
                 text: $viewModel.issue.description,
                 axis: .vertical
             )
