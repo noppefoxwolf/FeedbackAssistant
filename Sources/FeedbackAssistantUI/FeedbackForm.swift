@@ -95,7 +95,7 @@ public struct FeedbackForm: View {
     
     
     private var basicInformationSection: some View {
-        Section(String(localized: "Basic Information", bundle: .module)) {
+        Section("Basic Information") {
             FormFieldView(
                 title: String(localized: "Enter a title that describes your feedback", bundle: .module),
                 placeholder: String(localized: "App crashes when tapping share", bundle: .module),
