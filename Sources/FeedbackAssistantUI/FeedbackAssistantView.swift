@@ -45,15 +45,12 @@ public struct FeedbackAssistantView: View {
     @State private var viewModel: FeedbackViewModel
     
     private let submissionHandler: FeedbackSubmissionProtocol
-    private weak var delegate: FeedbackSubmissionDelegate?
     
     public init(
         submissionHandler: FeedbackSubmissionProtocol,
-        delegate: FeedbackSubmissionDelegate? = nil,
         initialIssue: Issue = Issue()
     ) {
         self.submissionHandler = submissionHandler
-        self.delegate = delegate
         self._viewModel = State(initialValue: FeedbackViewModel(initialIssue: initialIssue))
     }
     
@@ -86,14 +83,12 @@ public struct FeedbackAssistantView: View {
     
     private func submitFeedback() async {
         viewModel.isSubmitting = true
-        delegate?.feedbackSubmissionDidStart()
         
         do {
             try await submissionHandler.submitFeedback(viewModel.issue)
-            delegate?.feedbackSubmissionDidComplete(viewModel.issue)
             dismiss()
         } catch {
-            delegate?.feedbackSubmissionDidFail(viewModel.issue, error: error)
+            print("Error submitting feedback: \(error)")
             viewModel.isSubmitting = false
         }
     }
