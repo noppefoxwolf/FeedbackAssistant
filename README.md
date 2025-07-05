@@ -24,7 +24,7 @@ Add the following to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/noppefoxwolf/FeedbackAssistant.git", from: "1.0.0")
+    .package(url: "https://github.com/noppefoxwolf/FeedbackAssistant.git", from: "0.0.2")
 ]
 ```
 
@@ -46,13 +46,13 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            Button("Show Feedback") {
+            Button("Send Feedback") {
                 showingFeedback = true
             }
         }
         .sheet(isPresented: $showingFeedback) {
-            FeedbackAssistantView(
-                submissionHandler: YourFeedbackSubmissionHandler()
+            FeedbackForm(
+                submitter: YourFeedbackSubmitter()
             )
         }
     }
@@ -76,30 +76,30 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $showingFeedback) {
-            FeedbackAssistantView(
-                submissionHandler: YourFeedbackSubmissionHandler(),
-                initialIssue: createIssueWithAttachments()
+            FeedbackForm(
+                submitter: YourFeedbackSubmitter(),
+                initialFeedback: createFeedbackWithAttachments()
             )
         }
     }
     
-    private func createIssueWithAttachments() -> Issue {
+    private func createFeedbackWithAttachments() -> Feedback {
         var attachments: [Attachment] = []
         
         // Add screenshot
-        if let screenshotAttachment = captureScreenshotAttachment() {
+        if let screenshotAttachment = makeScreenshotAttachment() {
             attachments.append(screenshotAttachment)
         }
         
         // Add view hierarchy
-        if let hierarchyAttachment = viewHierarchyAttachment() {
+        if let hierarchyAttachment = makeViewHierarchyAttachment() {
             attachments.append(hierarchyAttachment)
         }
         
-        return Issue(attachments: attachments)
+        return Feedback(attachments: attachments)
     }
     
-    private func captureScreenshotAttachment() -> Attachment? {
+    private func makeScreenshotAttachment() -> Attachment? {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first else {
             return nil
@@ -121,7 +121,7 @@ struct ContentView: View {
         )
     }
     
-    private func viewHierarchyAttachment() -> Attachment? {
+    private func makeViewHierarchyAttachment() -> Attachment? {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first else {
             return nil
@@ -141,91 +141,138 @@ struct ContentView: View {
 
 ### Custom Submission Handler
 
-Implement the `FeedbackSubmissionProtocol` to handle feedback submission:
+Implement the `FeedbackSubmitting` protocol to handle feedback submission:
 
 ```swift
 import FeedbackAssistant
 
-class YourFeedbackSubmissionHandler: FeedbackSubmissionProtocol {
-    func submitFeedback(_ issue: Issue) async throws {
+struct YourFeedbackSubmitter: FeedbackSubmitting {
+    func submit(_ feedback: Feedback) async throws {
         // Submit feedback to your backend service
-        // Handle the issue data, attachments, etc.
-        print("Submitting feedback: \(issue.title)")
+        // Handle the feedback data, attachments, etc.
+        print("Submitting feedback: \(feedback.title)")
         
         // Example: Send to your API
-        try await sendToAPI(issue)
+        try await sendToAPI(feedback)
     }
     
-    private func sendToAPI(_ issue: Issue) async throws {
+    private func sendToAPI(_ feedback: Feedback) async throws {
         // Your API implementation
     }
 }
 ```
 
-## Components
+## API Reference
 
-### FeedbackAssistantView
+### Components
+
+#### FeedbackForm
 
 The main UI component for collecting feedback with a modern SwiftUI interface.
 
+```swift
+public struct FeedbackForm: View {
+    public init(
+        submitter: FeedbackSubmitting,
+        initialFeedback: Feedback = Feedback()
+    )
+}
+```
+
 **Parameters:**
-- `submissionHandler`: Object conforming to `FeedbackSubmissionProtocol`
-- `initialIssue`: Pre-populated issue data (optional)
+- `submitter`: Object conforming to `FeedbackSubmitting` protocol
+- `initialFeedback`: Pre-populated feedback data (optional)
 
 **Features:**
-- Form fields for title and description
-- Feedback type picker (Bug Report, Feature Request, Performance Issue, Usability Issue, Other)
-- System information display (app version, device info, iOS version)
-- Attachment management with QuickLook preview
-- Multi-language support
+- 📝 Form fields for title and description
+- 🏷️ Feedback type picker with 5 categories
+- ℹ️ Automatic system information display
+- 📎 Attachment management with QuickLook preview
+- 🌐 Multi-language support (English/Japanese)
 
-### Issue
+### Data Models
 
-Data model representing a feedback issue with automatic system information collection.
+#### Feedback
 
-**Properties:**
-- `title`: Issue title
-- `description`: Detailed description  
-- `type`: Feedback type (FeedbackType enum)
-- `attachments`: Array of file attachments
-- `systemInfo`: Automatically collected system information
-- `createdAt`/`updatedAt`: Timestamps
+Data model representing user feedback with automatic system information collection.
 
-### Attachment
+```swift
+public struct Feedback: Codable, Identifiable, Sendable {
+    public var title: String
+    public var description: String
+    public var type: FeedbackType
+    public var attachments: [Attachment]
+    public let systemInfo: SystemInfo
+    
+    // Methods
+    public mutating func attach(_ attachment: Attachment)
+    public mutating func detach(_ attachment: Attachment)
+}
+```
+
+#### Attachment
 
 Data model for file attachments with rich content type support.
 
-**Properties:**
-- `name`: File name
-- `data`: File data
-- `contentType`: UTType of the file
-- `createdAt`: Creation timestamp
-- `fileSize`: Computed property for human-readable file size
-- `isImage`/`isText`: Convenience properties for content type checking
+```swift
+public struct Attachment: Codable, Identifiable, Sendable {
+    public let name: String
+    public let data: Data
+    public let contentType: UTType
+    public let createdAt: Date
+    
+    // Computed properties
+    public var fileSize: String
+    public var isImage: Bool
+    public var isText: Bool
+}
+```
 
-### SystemInfo
+#### SystemInfo
 
-Automatically collected system information.
+Automatically collected system information included with every feedback.
 
-**Properties:**
-- `appVersion`: App version from CFBundleShortVersionString
-- `appBuildNumber`: Build number from CFBundleVersion
-- `bundleIdentifier`: App bundle identifier
-- `systemVersion`: iOS version
-- `deviceModel`: Device model (iPhone, iPad, etc.)
-- `deviceName`: User-assigned device name
-- `systemName`: OS name (iOS, iPadOS)
+```swift
+public struct SystemInfo: Codable, Sendable {
+    public let appVersion: String
+    public let appBuildNumber: String
+    public let bundleIdentifier: String
+    public let systemVersion: String
+    public let deviceModel: String
+    public let deviceName: String
+    public let systemName: String
+}
+```
 
-### FeedbackType
+### Enumerations
+
+#### FeedbackType
 
 Enumeration of available feedback types with localized titles.
 
-**Cases:**
-- `.bug`: Bug Report
-- `.featureRequest`: Feature Request  
-- `.performance`: Performance Issue
-- `.usability`: Usability Issue
-- `.other`: Other
+```swift
+public enum FeedbackType: String, CaseIterable, Codable {
+    case bug
+    case featureRequest
+    case performance
+    case usability
+    case other
+    
+    public var localizedTitle: String { /* localized titles */ }
+}
+```
+
+### Protocols
+
+#### FeedbackSubmitting
+
+Protocol for handling feedback submission to your backend service.
+
+```swift
+public protocol FeedbackSubmitting: Sendable {
+    func submit(_ feedback: Feedback) async throws
+}
+```
 
 ## Localization
 
