@@ -1,15 +1,18 @@
 # FeedbackAssistant
 
-A Swift package for collecting user feedback in iOS apps with automatic screenshot capture and attachment functionality.
+A comprehensive Swift package for collecting user feedback in iOS apps with rich attachment support and automatic system information collection.
 
 ## Features
 
-- 📝 Easy-to-use feedback collection UI
-- 📸 Automatic screenshot capture and attachment
-- 🎨 Native SwiftUI interface
-- 📋 Customizable feedback types (Bug, Feature Request, General)
-- 📎 File attachment support
-- 🔌 Protocol-based submission handling
+- 📝 **Easy-to-use feedback collection UI** - Native SwiftUI interface with clean, intuitive design
+- 📸 **Automatic screenshot capture** - Capture current screen state with view hierarchy information
+- 🗂️ **View hierarchy attachment** - Automatically attach UI debugging information
+- 📋 **Multiple feedback types** - Bug Report, Feature Request, Performance Issue, Usability Issue, Other
+- 📎 **Rich file attachment support** - Images, documents, and custom files with QuickLook preview
+- ℹ️ **Automatic system information** - App version, device info, iOS version automatically collected
+- 🌐 **Multi-language support** - English and Japanese localization with String Catalog
+- 🎨 **Modern architecture** - Built with SwiftUI, Observation framework, and async/await
+- 🔌 **Protocol-based submission** - Flexible integration with any backend service
 
 ## Installation
 
@@ -54,7 +57,7 @@ struct ContentView: View {
 }
 ```
 
-### With Automatic Screenshot
+### With Automatic Screenshot and View Hierarchy
 
 ```swift
 import SwiftUI
@@ -66,33 +69,35 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            Button("Show Feedback") {
+            Button("Send Feedback") {
                 showingFeedback = true
             }
         }
         .sheet(isPresented: $showingFeedback) {
             FeedbackAssistantView(
                 submissionHandler: YourFeedbackSubmissionHandler(),
-                initialIssue: createIssueWithScreenshot()
+                initialIssue: createIssueWithAttachments()
             )
         }
     }
     
-    private func createIssueWithScreenshot() -> Issue {
-        guard let screenshot = captureScreenshot() else {
-            return Issue()
+    private func createIssueWithAttachments() -> Issue {
+        var attachments: [Attachment] = []
+        
+        // Add screenshot
+        if let screenshotAttachment = captureScreenshotAttachment() {
+            attachments.append(screenshotAttachment)
         }
         
-        let attachment = Attachment(
-            name: "screenshot_\(Date().timeIntervalSince1970).png",
-            data: screenshot,
-            contentType: .png
-        )
+        // Add view hierarchy
+        if let hierarchyAttachment = viewHierarchyAttachment() {
+            attachments.append(hierarchyAttachment)
+        }
         
-        return Issue(attachments: [attachment])
+        return Issue(attachments: attachments)
     }
     
-    private func captureScreenshot() -> Data? {
+    private func captureScreenshotAttachment() -> Attachment? {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first else {
             return nil
@@ -103,7 +108,31 @@ struct ContentView: View {
             window.layer.render(in: context.cgContext)
         }
         
-        return image.pngData()
+        guard let imageData = image.pngData() else {
+            return nil
+        }
+        
+        return Attachment(
+            name: "screenshot_\(Date().timeIntervalSince1970).png",
+            data: imageData,
+            contentType: .png
+        )
+    }
+    
+    private func viewHierarchyAttachment() -> Attachment? {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else {
+            return nil
+        }
+        
+        let hierarchyDescription = window.perform(Selector(("recursiveDescription")))?.takeUnretainedValue() as? String ?? "Unable to get view hierarchy"
+        let hierarchyData = hierarchyDescription.data(using: String.Encoding.utf8) ?? Data()
+        
+        return Attachment(
+            name: "view_hierarchy_\(Date().timeIntervalSince1970).txt",
+            data: hierarchyData,
+            contentType: .plainText
+        )
     }
 }
 ```
@@ -135,40 +164,100 @@ class YourFeedbackSubmissionHandler: FeedbackSubmissionProtocol {
 
 ### FeedbackAssistantView
 
-The main UI component for collecting feedback.
+The main UI component for collecting feedback with a modern SwiftUI interface.
 
 **Parameters:**
 - `submissionHandler`: Object conforming to `FeedbackSubmissionProtocol`
-- `delegate`: Optional delegate for submission events
-- `initialIssue`: Pre-populated issue data
+- `initialIssue`: Pre-populated issue data (optional)
+
+**Features:**
+- Form fields for title and description
+- Feedback type picker (Bug Report, Feature Request, Performance Issue, Usability Issue, Other)
+- System information display (app version, device info, iOS version)
+- Attachment management with QuickLook preview
+- Multi-language support
 
 ### Issue
 
-Data model representing a feedback issue.
+Data model representing a feedback issue with automatic system information collection.
 
 **Properties:**
 - `title`: Issue title
-- `description`: Detailed description
-- `type`: Feedback type (bug, feature request, general)
+- `description`: Detailed description  
+- `type`: Feedback type (FeedbackType enum)
 - `attachments`: Array of file attachments
+- `systemInfo`: Automatically collected system information
+- `createdAt`/`updatedAt`: Timestamps
 
 ### Attachment
 
-Data model for file attachments.
+Data model for file attachments with rich content type support.
 
 **Properties:**
 - `name`: File name
 - `data`: File data
 - `contentType`: UTType of the file
 - `createdAt`: Creation timestamp
+- `fileSize`: Computed property for human-readable file size
+- `isImage`/`isText`: Convenience properties for content type checking
+
+### SystemInfo
+
+Automatically collected system information.
+
+**Properties:**
+- `appVersion`: App version from CFBundleShortVersionString
+- `appBuildNumber`: Build number from CFBundleVersion
+- `bundleIdentifier`: App bundle identifier
+- `systemVersion`: iOS version
+- `deviceModel`: Device model (iPhone, iPad, etc.)
+- `deviceName`: User-assigned device name
+- `systemName`: OS name (iOS, iPadOS)
+
+### FeedbackType
+
+Enumeration of available feedback types with localized titles.
+
+**Cases:**
+- `.bug`: Bug Report
+- `.featureRequest`: Feature Request  
+- `.performance`: Performance Issue
+- `.usability`: Usability Issue
+- `.other`: Other
+
+## Localization
+
+FeedbackAssistant supports multiple languages through String Catalog:
+
+- **English** (default)
+- **Japanese** (日本語)
+
+To add support for additional languages, add translations to the String Catalog files:
+- `Sources/FeedbackAssistant/Resources/Localizable.xcstrings` 
+- `Sources/FeedbackAssistantUI/Resources/Localizable.xcstrings`
+
+## Architecture
+
+Built with modern iOS development practices:
+
+- **SwiftUI**: Native declarative UI framework
+- **Observation**: Modern reactive programming with `@Observable`
+- **Async/Await**: Asynchronous submission handling
+- **Protocol-Oriented**: Flexible submission handling
+- **String Catalog**: Modern localization approach
+- **QuickLook**: Native file preview functionality
 
 ## Example App
 
-Check out the `Example.swiftpm` folder for a complete example implementation.
+Check out the `Example.swiftpm` folder for a complete example implementation that demonstrates:
+- Automatic screenshot capture
+- View hierarchy attachment  
+- Custom submission handling
+- Japanese localization
 
 ## Requirements
 
-- iOS 16.0+
+- iOS 17.0+
 - Swift 6.0+
 - Xcode 16.0+
 
@@ -179,3 +268,9 @@ MIT License. See [LICENSE](LICENSE) for details.
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Screenshots
+
+![FeedbackAssistant Interface](.github/screenshot.png)
+
+*Modern SwiftUI interface with automatic screenshot capture and system information collection*
