@@ -10,7 +10,7 @@ public struct FeedbackAssistantView: View {
     @State private var showingImagePicker = false
     @State private var showingDocumentPicker = false
     @State private var showingActionSheet = false
-    @State private var selectedAttachment: Attachment?
+    @State private var selectedAttachmentURL: URL?
     
     private let submissionHandler: FeedbackSubmissionProtocol
     private weak var delegate: FeedbackSubmissionDelegate?
@@ -47,9 +47,7 @@ public struct FeedbackAssistantView: View {
             .sheet(isPresented: $showingDocumentPicker) {
                 documentPickerSheet
             }
-            .quickLookPreview($selectedAttachment, in: issue.attachments) { attachment in
-                createTempFileForQuickLook(attachment)
-            }
+            .quickLookPreview($selectedAttachmentURL)
         }
     }
     
@@ -156,7 +154,7 @@ public struct FeedbackAssistantView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            selectedAttachment = attachment
+            selectedAttachmentURL = createTempFileForQuickLook(attachment)
         }
         .swipeActions(edge: .trailing) {
             Button("Delete", role: .destructive) {
@@ -228,7 +226,8 @@ public struct FeedbackAssistantView: View {
         }
     }
     
-    private func createTempFileForQuickLook(_ attachment: Attachment) -> URL {
+    
+    private func createTempFileForQuickLook(_ attachment: Attachment) -> URL? {
         let tempURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(attachment.name)
         
@@ -237,7 +236,7 @@ public struct FeedbackAssistantView: View {
             return tempURL
         } catch {
             print("Error writing temporary file: \(error)")
-            return FileManager.default.temporaryDirectory.appendingPathComponent("error.txt")
+            return nil
         }
     }
     
