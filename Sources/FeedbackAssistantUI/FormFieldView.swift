@@ -1,14 +1,14 @@
 import SwiftUI
 
 struct FormFieldView: View {
-    let title: LocalizedStringKey
-    let placeholder: LocalizedStringKey
+    let title: String
+    let placeholder: String
     @Binding var text: String
     let axis: Axis
     
     init(
-        title: LocalizedStringKey,
-        placeholder: LocalizedStringKey,
+        title: String,
+        placeholder: String,
         text: Binding<String>,
         axis: Axis = .horizontal
     ) {
@@ -20,7 +20,7 @@ struct FormFieldView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title, bundle: .module)
+            Text(title)
                 .font(.subheadline)
                 .fontWeight(.bold)
                 .foregroundColor(.primary)
@@ -29,7 +29,7 @@ struct FormFieldView: View {
             TextField(
                 title,
                 text: $text,
-                prompt: Text(placeholder, bundle: .module),
+                prompt: Text(placeholder),
                 axis: axis
             )
         }

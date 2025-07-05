@@ -62,12 +62,12 @@ public struct FeedbackAssistantView: View {
                 systemInformationSection
                 attachmentsSection
             }
-            .navigationTitle("Feedback")
+            .navigationTitle(String(localized: "Feedback", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 toolbarContent
             }
-            .confirmationDialog("Add Attachment", isPresented: $viewModel.showingActionSheet) {
+            .confirmationDialog(String(localized: "Add Attachment", bundle: .module), isPresented: $viewModel.showingActionSheet) {
                 attachmentDialogContent
             }
             .sheet(isPresented: $viewModel.showingImagePicker) {
@@ -95,15 +95,15 @@ public struct FeedbackAssistantView: View {
     
     
     private var basicInformationSection: some View {
-        Section("Basic Information") {
+        Section(String(localized: "Basic Information", bundle: .module)) {
             FormFieldView(
-                title: "Enter a title that describes your feedback",
-                placeholder: "Example: Cannot make calls from lock screen",
+                title: String(localized: "Enter a title that describes your feedback", bundle: .module),
+                placeholder: String(localized: "Example: Cannot make calls from lock screen", bundle: .module),
                 text: $viewModel.issue.title,
                 axis: .vertical
             )
             
-            Picker("Feedback Type", selection: $viewModel.issue.type) {
+            Picker(String(localized: "Feedback Type", bundle: .module), selection: $viewModel.issue.type) {
                 ForEach(FeedbackType.allCases, id: \.self) { type in
                     Text(type.localizedTitle).tag(type)
                 }
@@ -113,10 +113,10 @@ public struct FeedbackAssistantView: View {
     }
     
     private var descriptionSection: some View {
-        Section("Description") {
+        Section(String(localized: "Description", bundle: .module)) {
             FormFieldView(
-                title: "Please enter the problem and steps to reproduce it",
-                placeholder: "Describe the problem, steps to reproduce, expected and actual results",
+                title: String(localized: "Please enter the problem and steps to reproduce it", bundle: .module),
+                placeholder: String(localized: "Describe the problem, steps to reproduce, expected and actual results", bundle: .module),
                 text: $viewModel.issue.description,
                 axis: .vertical
             )
@@ -124,14 +124,14 @@ public struct FeedbackAssistantView: View {
     }
     
     private var systemInformationSection: some View {
-        Section("System Information") {
+        Section(String(localized: "System Information", bundle: .module)) {
             VStack(alignment: .leading, spacing: 8) {
-                SystemInfoRow(label: "App Version", value: viewModel.issue.systemInfo.appVersion)
-                SystemInfoRow(label: "Build Number", value: viewModel.issue.systemInfo.appBuildNumber)
-                SystemInfoRow(label: "Bundle ID", value: viewModel.issue.systemInfo.bundleIdentifier)
-                SystemInfoRow(label: "iOS Version", value: viewModel.issue.systemInfo.systemVersion)
-                SystemInfoRow(label: "Device Model", value: viewModel.issue.systemInfo.deviceModel)
-                SystemInfoRow(label: "Device Name", value: viewModel.issue.systemInfo.deviceName)
+                SystemInfoRow(label: String(localized: "App Version", bundle: .module), value: viewModel.issue.systemInfo.appVersion)
+                SystemInfoRow(label: String(localized: "Build Number", bundle: .module), value: viewModel.issue.systemInfo.appBuildNumber)
+                SystemInfoRow(label: String(localized: "Bundle ID", bundle: .module), value: viewModel.issue.systemInfo.bundleIdentifier)
+                SystemInfoRow(label: String(localized: "iOS Version", bundle: .module), value: viewModel.issue.systemInfo.systemVersion)
+                SystemInfoRow(label: String(localized: "Device Model", bundle: .module), value: viewModel.issue.systemInfo.deviceModel)
+                SystemInfoRow(label: String(localized: "Device Name", bundle: .module), value: viewModel.issue.systemInfo.deviceName)
             }
             .font(.caption)
             .foregroundColor(.secondary)
@@ -139,8 +139,8 @@ public struct FeedbackAssistantView: View {
     }
     
     private var attachmentsSection: some View {
-        Section("Attachments") {
-            Button("Add Attachment") {
+        Section(String(localized: "Attachments", bundle: .module)) {
+            Button(String(localized: "Add Attachment", bundle: .module)) {
                 viewModel.showingActionSheet = true
             }
             
@@ -184,7 +184,7 @@ public struct FeedbackAssistantView: View {
             viewModel.selectedAttachmentURL = viewModel.createTempFileForQuickLook(attachment)
         }
         .swipeActions(edge: .trailing) {
-            Button("Delete", role: .destructive) {
+            Button(String(localized: "Delete", bundle: .module), role: .destructive) {
                 viewModel.removeAttachment(attachment)
             }
         }
@@ -193,13 +193,13 @@ public struct FeedbackAssistantView: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .navigationBarLeading) {
-            Button("Close") {
+            Button(String(localized: "Close", bundle: .module)) {
                 dismiss()
             }
         }
         
         ToolbarItem(placement: .navigationBarTrailing) {
-            Button("Submit") {
+            Button(String(localized: "Submit", bundle: .module)) {
                 Task {
                     await submitFeedback()
                 }
@@ -210,13 +210,13 @@ public struct FeedbackAssistantView: View {
     
     @ViewBuilder
     private var attachmentDialogContent: some View {
-        Button("Photo Library") {
+        Button(String(localized: "Photo Library", bundle: .module)) {
             viewModel.showingImagePicker = true
         }
-        Button("Files") {
+        Button(String(localized: "Files", bundle: .module)) {
             viewModel.showingDocumentPicker = true
         }
-        Button("Cancel", role: .cancel) {}
+        Button(String(localized: "Cancel", bundle: .module), role: .cancel) {}
     }
     
     @ViewBuilder

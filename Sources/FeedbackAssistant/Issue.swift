@@ -35,7 +35,7 @@ public enum FeedbackType: String, CaseIterable, Codable, Sendable {
     case other = "Other"
     
     public var localizedTitle: String {
-        return rawValue
+        return String(localized: String.LocalizationValue(rawValue), bundle: .module)
     }
 }
 

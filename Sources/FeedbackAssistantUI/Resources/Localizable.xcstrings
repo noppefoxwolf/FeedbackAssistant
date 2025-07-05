@@ -11,6 +11,9 @@
         }
       }
     },
+    "App Version" : {
+
+    },
     "Attachments" : {
       "localizations" : {
         "ja" : {
@@ -41,6 +44,12 @@
           }
         }
       }
+    },
+    "Build Number" : {
+
+    },
+    "Bundle ID" : {
+
     },
     "Cancel" : {
 
@@ -77,6 +86,12 @@
           }
         }
       }
+    },
+    "Device Model" : {
+
+    },
+    "Device Name" : {
+
     },
     "Enter a title that describes your feedback" : {
       "localizations" : {
@@ -130,6 +145,9 @@
       }
     },
     "Files" : {
+
+    },
+    "iOS Version" : {
 
     },
     "Other" : {
