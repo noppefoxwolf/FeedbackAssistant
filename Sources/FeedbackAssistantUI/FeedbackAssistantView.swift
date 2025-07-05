@@ -1,16 +1,48 @@
 import SwiftUI
 import FeedbackAssistant
 import QuickLook
+import Observation
+
+@Observable
+@MainActor
+class FeedbackViewModel {
+    var issue: Issue
+    var isSubmitting = false
+    var showingImagePicker = false
+    var showingDocumentPicker = false
+    var showingActionSheet = false
+    var selectedAttachmentURL: URL?
+    
+    init(initialIssue: Issue = Issue()) {
+        self.issue = initialIssue
+    }
+    
+    func addAttachment(_ attachment: Attachment) {
+        issue.addAttachment(attachment)
+    }
+    
+    func removeAttachment(_ attachment: Attachment) {
+        issue.removeAttachment(attachment)
+    }
+    
+    func createTempFileForQuickLook(_ attachment: Attachment) -> URL? {
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(attachment.name)
+        
+        do {
+            try attachment.data.write(to: tempURL)
+            return tempURL
+        } catch {
+            print("Error writing temporary file: \(error)")
+            return nil
+        }
+    }
+}
 
 public struct FeedbackAssistantView: View {
     @Environment(\.dismiss)
     private var dismiss
-    @State private var issue: Issue
-    @State private var isSubmitting = false
-    @State private var showingImagePicker = false
-    @State private var showingDocumentPicker = false
-    @State private var showingActionSheet = false
-    @State private var selectedAttachmentURL: URL?
+    @State private var viewModel: FeedbackViewModel
     
     private let submissionHandler: FeedbackSubmissionProtocol
     private weak var delegate: FeedbackSubmissionDelegate?
@@ -22,7 +54,7 @@ public struct FeedbackAssistantView: View {
     ) {
         self.submissionHandler = submissionHandler
         self.delegate = delegate
-        self._issue = State(initialValue: initialIssue)
+        self._viewModel = State(initialValue: FeedbackViewModel(initialIssue: initialIssue))
     }
     
     public var body: some View {
@@ -38,31 +70,31 @@ public struct FeedbackAssistantView: View {
             .toolbar {
                 toolbarContent
             }
-            .confirmationDialog("Add Attachment", isPresented: $showingActionSheet) {
+            .confirmationDialog("Add Attachment", isPresented: $viewModel.showingActionSheet) {
                 attachmentDialogContent
             }
-            .sheet(isPresented: $showingImagePicker) {
+            .sheet(isPresented: $viewModel.showingImagePicker) {
                 imagePickerSheet
             }
-            .sheet(isPresented: $showingDocumentPicker) {
+            .sheet(isPresented: $viewModel.showingDocumentPicker) {
                 documentPickerSheet
             }
-            .quickLookPreview($selectedAttachmentURL)
+            .quickLookPreview($viewModel.selectedAttachmentURL)
         }
     }
     
     
     private func submitFeedback() async {
-        isSubmitting = true
+        viewModel.isSubmitting = true
         delegate?.feedbackSubmissionDidStart()
         
         do {
-            try await submissionHandler.submitFeedback(issue)
-            delegate?.feedbackSubmissionDidComplete(issue)
+            try await submissionHandler.submitFeedback(viewModel.issue)
+            delegate?.feedbackSubmissionDidComplete(viewModel.issue)
             dismiss()
         } catch {
-            delegate?.feedbackSubmissionDidFail(issue, error: error)
-            isSubmitting = false
+            delegate?.feedbackSubmissionDidFail(viewModel.issue, error: error)
+            viewModel.isSubmitting = false
         }
     }
     
@@ -72,11 +104,11 @@ public struct FeedbackAssistantView: View {
             FormFieldView(
                 title: "Enter a title that describes your feedback",
                 placeholder: "Example: Cannot make calls from lock screen",
-                text: $issue.title,
+                text: $viewModel.issue.title,
                 axis: .vertical
             )
             
-            Picker("Feedback Type", selection: $issue.type) {
+            Picker("Feedback Type", selection: $viewModel.issue.type) {
                 ForEach(FeedbackType.allCases, id: \.self) { type in
                     Text(type.localizedTitle).tag(type)
                 }
@@ -90,7 +122,7 @@ public struct FeedbackAssistantView: View {
             FormFieldView(
                 title: "Please enter the problem and steps to reproduce it",
                 placeholder: "Describe the problem, steps to reproduce, expected and actual results",
-                text: $issue.description,
+                text: $viewModel.issue.description,
                 axis: .vertical
             )
         }
@@ -99,12 +131,12 @@ public struct FeedbackAssistantView: View {
     private var systemInformationSection: some View {
         Section("System Information") {
             VStack(alignment: .leading, spacing: 8) {
-                SystemInfoRow(label: "App Version", value: issue.systemInfo.appVersion)
-                SystemInfoRow(label: "Build Number", value: issue.systemInfo.appBuildNumber)
-                SystemInfoRow(label: "Bundle ID", value: issue.systemInfo.bundleIdentifier)
-                SystemInfoRow(label: "iOS Version", value: issue.systemInfo.systemVersion)
-                SystemInfoRow(label: "Device Model", value: issue.systemInfo.deviceModel)
-                SystemInfoRow(label: "Device Name", value: issue.systemInfo.deviceName)
+                SystemInfoRow(label: "App Version", value: viewModel.issue.systemInfo.appVersion)
+                SystemInfoRow(label: "Build Number", value: viewModel.issue.systemInfo.appBuildNumber)
+                SystemInfoRow(label: "Bundle ID", value: viewModel.issue.systemInfo.bundleIdentifier)
+                SystemInfoRow(label: "iOS Version", value: viewModel.issue.systemInfo.systemVersion)
+                SystemInfoRow(label: "Device Model", value: viewModel.issue.systemInfo.deviceModel)
+                SystemInfoRow(label: "Device Name", value: viewModel.issue.systemInfo.deviceName)
             }
             .font(.caption)
             .foregroundColor(.secondary)
@@ -114,10 +146,10 @@ public struct FeedbackAssistantView: View {
     private var attachmentsSection: some View {
         Section("Attachments") {
             Button("Add Attachment") {
-                showingActionSheet = true
+                viewModel.showingActionSheet = true
             }
             
-            ForEach(issue.attachments) { attachment in
+            ForEach(viewModel.issue.attachments) { attachment in
                 attachmentRow(attachment)
             }
         }
@@ -154,11 +186,11 @@ public struct FeedbackAssistantView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            selectedAttachmentURL = createTempFileForQuickLook(attachment)
+            viewModel.selectedAttachmentURL = viewModel.createTempFileForQuickLook(attachment)
         }
         .swipeActions(edge: .trailing) {
             Button("Delete", role: .destructive) {
-                removeAttachment(attachment)
+                viewModel.removeAttachment(attachment)
             }
         }
     }
@@ -177,17 +209,17 @@ public struct FeedbackAssistantView: View {
                     await submitFeedback()
                 }
             }
-            .disabled(issue.title.isEmpty || issue.description.isEmpty || isSubmitting)
+            .disabled(viewModel.issue.title.isEmpty || viewModel.issue.description.isEmpty || viewModel.isSubmitting)
         }
     }
     
     @ViewBuilder
     private var attachmentDialogContent: some View {
         Button("Photo Library") {
-            showingImagePicker = true
+            viewModel.showingImagePicker = true
         }
         Button("Files") {
-            showingDocumentPicker = true
+            viewModel.showingDocumentPicker = true
         }
         Button("Cancel", role: .cancel) {}
     }
@@ -201,7 +233,7 @@ public struct FeedbackAssistantView: View {
                     data: imageData,
                     contentType: .png
                 )
-                issue.addAttachment(attachment)
+                viewModel.addAttachment(attachment)
             }
         }
     }
@@ -219,7 +251,7 @@ public struct FeedbackAssistantView: View {
                     data: data,
                     contentType: contentType
                 )
-                issue.addAttachment(attachment)
+                viewModel.addAttachment(attachment)
             } catch {
                 print("Error loading file: \(error)")
             }
@@ -227,22 +259,6 @@ public struct FeedbackAssistantView: View {
     }
     
     
-    private func createTempFileForQuickLook(_ attachment: Attachment) -> URL? {
-        let tempURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent(attachment.name)
-        
-        do {
-            try attachment.data.write(to: tempURL)
-            return tempURL
-        } catch {
-            print("Error writing temporary file: \(error)")
-            return nil
-        }
-    }
-    
-    private func removeAttachment(_ attachment: Attachment) {
-        issue.removeAttachment(attachment)
-    }
 }
 
 struct SystemInfoRow: View {
