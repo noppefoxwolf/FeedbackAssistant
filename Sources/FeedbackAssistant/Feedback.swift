@@ -39,7 +39,7 @@ public enum FeedbackType: String, CaseIterable, Codable, Sendable {
     }
 }
 
-public struct Issue: Codable, Identifiable, Sendable {
+public struct Feedback: Codable, Identifiable, Sendable {
     public let id: UUID
     public var title: String
     public var description: String

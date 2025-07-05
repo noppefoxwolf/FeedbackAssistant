@@ -20,7 +20,7 @@ struct ContentView: View {
         .sheet(isPresented: $showingFeedback) {
             FeedbackAssistantView(
                 submissionHandler: MockFeedbackSubmissionHandler(),
-                initialIssue: createIssueWithScreenshot()
+                initialFeedback: createFeedbackWithScreenshot()
             )
         }
     }
@@ -29,7 +29,7 @@ struct ContentView: View {
         showingFeedback = true
     }
     
-    private func createIssueWithScreenshot() -> Issue {
+    private func createFeedbackWithScreenshot() -> Feedback {
         var attachments: [Attachment] = []
         
         if let screenshotAttachment = captureScreenshotAttachment() {
@@ -40,7 +40,7 @@ struct ContentView: View {
             attachments.append(hierarchyAttachment)
         }
         
-        return Issue(attachments: attachments)
+        return Feedback(attachments: attachments)
     }
     
     private func captureScreenshotAttachment() -> Attachment? {
@@ -83,8 +83,8 @@ struct ContentView: View {
 }
 
 struct MockFeedbackSubmissionHandler: FeedbackSubmissionProtocol {
-    func submitFeedback(_ issue: Issue) async throws {
+    func submitFeedback(_ feedback: Feedback) async throws {
         try await Task.sleep(nanoseconds: 1_000_000_000)
-        print("Mock submission: \(issue.title)")
+        print("Mock submission: \(feedback.title)")
     }
 }

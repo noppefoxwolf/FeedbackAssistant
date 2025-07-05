@@ -6,23 +6,23 @@ import Observation
 @Observable
 @MainActor
 class FeedbackViewModel {
-    var issue: Issue
+    var feedback: Feedback
     var isSubmitting = false
     var showingImagePicker = false
     var showingDocumentPicker = false
     var showingActionSheet = false
     var selectedAttachmentURL: URL?
     
-    init(initialIssue: Issue = Issue()) {
-        self.issue = initialIssue
+    init(initialFeedback: Feedback = Feedback()) {
+        self.feedback = initialFeedback
     }
     
     func addAttachment(_ attachment: Attachment) {
-        issue.addAttachment(attachment)
+        feedback.addAttachment(attachment)
     }
     
     func removeAttachment(_ attachment: Attachment) {
-        issue.removeAttachment(attachment)
+        feedback.removeAttachment(attachment)
     }
     
     func createTempFileForQuickLook(_ attachment: Attachment) -> URL? {
@@ -48,10 +48,10 @@ public struct FeedbackAssistantView: View {
     
     public init(
         submissionHandler: FeedbackSubmissionProtocol,
-        initialIssue: Issue = Issue()
+        initialFeedback: Feedback = Feedback()
     ) {
         self.submissionHandler = submissionHandler
-        self._viewModel = State(initialValue: FeedbackViewModel(initialIssue: initialIssue))
+        self._viewModel = State(initialValue: FeedbackViewModel(initialFeedback: initialFeedback))
     }
     
     public var body: some View {
@@ -85,7 +85,7 @@ public struct FeedbackAssistantView: View {
         viewModel.isSubmitting = true
         
         do {
-            try await submissionHandler.submitFeedback(viewModel.issue)
+            try await submissionHandler.submitFeedback(viewModel.feedback)
             dismiss()
         } catch {
             print("Error submitting feedback: \(error)")
@@ -99,11 +99,11 @@ public struct FeedbackAssistantView: View {
             FormFieldView(
                 title: String(localized: "Enter a title that describes your feedback", bundle: .module),
                 placeholder: String(localized: "App crashes when tapping share", bundle: .module),
-                text: $viewModel.issue.title,
+                text: $viewModel.feedback.title,
                 axis: .vertical
             )
             
-            Picker(String(localized: "Feedback Type", bundle: .module), selection: $viewModel.issue.type) {
+            Picker(String(localized: "Feedback Type", bundle: .module), selection: $viewModel.feedback.type) {
                 ForEach(FeedbackType.allCases, id: \.self) { type in
                     Text(type.localizedTitle).tag(type)
                 }
@@ -117,7 +117,7 @@ public struct FeedbackAssistantView: View {
             FormFieldView(
                 title: String(localized: "Please enter the problem and steps to reproduce it", bundle: .module),
                 placeholder: String(localized: "Tap share → app crashes", bundle: .module),
-                text: $viewModel.issue.description,
+                text: $viewModel.feedback.description,
                 axis: .vertical
             )
         }
@@ -126,12 +126,12 @@ public struct FeedbackAssistantView: View {
     private var systemInformationSection: some View {
         Section(String(localized: "System Information", bundle: .module)) {
             VStack(alignment: .leading, spacing: 8) {
-                SystemInfoRow(label: String(localized: "App Version", bundle: .module), value: viewModel.issue.systemInfo.appVersion)
-                SystemInfoRow(label: String(localized: "Build Number", bundle: .module), value: viewModel.issue.systemInfo.appBuildNumber)
-                SystemInfoRow(label: String(localized: "Bundle ID", bundle: .module), value: viewModel.issue.systemInfo.bundleIdentifier)
-                SystemInfoRow(label: String(localized: "iOS Version", bundle: .module), value: viewModel.issue.systemInfo.systemVersion)
-                SystemInfoRow(label: String(localized: "Device Model", bundle: .module), value: viewModel.issue.systemInfo.deviceModel)
-                SystemInfoRow(label: String(localized: "Device Name", bundle: .module), value: viewModel.issue.systemInfo.deviceName)
+                SystemInfoRow(label: String(localized: "App Version", bundle: .module), value: viewModel.feedback.systemInfo.appVersion)
+                SystemInfoRow(label: String(localized: "Build Number", bundle: .module), value: viewModel.feedback.systemInfo.appBuildNumber)
+                SystemInfoRow(label: String(localized: "Bundle ID", bundle: .module), value: viewModel.feedback.systemInfo.bundleIdentifier)
+                SystemInfoRow(label: String(localized: "iOS Version", bundle: .module), value: viewModel.feedback.systemInfo.systemVersion)
+                SystemInfoRow(label: String(localized: "Device Model", bundle: .module), value: viewModel.feedback.systemInfo.deviceModel)
+                SystemInfoRow(label: String(localized: "Device Name", bundle: .module), value: viewModel.feedback.systemInfo.deviceName)
             }
             .font(.caption)
             .foregroundColor(.secondary)
@@ -144,7 +144,7 @@ public struct FeedbackAssistantView: View {
                 viewModel.showingActionSheet = true
             }
             
-            ForEach(viewModel.issue.attachments) { attachment in
+            ForEach(viewModel.feedback.attachments) { attachment in
                 attachmentRow(attachment)
             }
         }
@@ -204,7 +204,7 @@ public struct FeedbackAssistantView: View {
                     await submitFeedback()
                 }
             }
-            .disabled(viewModel.issue.title.isEmpty || viewModel.issue.description.isEmpty || viewModel.isSubmitting)
+            .disabled(viewModel.feedback.title.isEmpty || viewModel.feedback.description.isEmpty || viewModel.isSubmitting)
         }
     }
     
@@ -343,18 +343,18 @@ struct DocumentPicker: UIViewControllerRepresentable {
 }
 
 struct MockFeedbackSubmissionHandler: FeedbackSubmissionProtocol {
-    func submitFeedback(_ issue: Issue) async throws {
+    func submitFeedback(_ feedback: Feedback) async throws {
         try await Task.sleep(nanoseconds: 1_000_000_000)
-        print("Mock submission: \(issue.title)")
+        print("Mock submission: \(feedback.title)")
     }
 }
 
 #Preview {
     FeedbackAssistantView(
         submissionHandler: MockFeedbackSubmissionHandler(),
-        initialIssue: Issue(
-            title: "Example Issue",
-            description: "This is a pre-filled issue for testing",
+        initialFeedback: Feedback(
+            title: "Example Feedback",
+            description: "This is a pre-filled feedback for testing",
             type: .bug,
             attachments: [
                 Attachment(
