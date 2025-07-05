@@ -136,9 +136,6 @@ public struct FeedbackAssistantView: View {
                 Button("Files") {
                     showingDocumentPicker = true
                 }
-                Button("View Hierarchy") {
-                    attachViewHierarchy()
-                }
                 Button("Cancel", role: .cancel) {}
             }
             .sheet(isPresented: $showingImagePicker) {
@@ -227,6 +224,14 @@ struct AttachmentPreviewView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if attachment.isText, let text = String(data: attachment.data, encoding: .utf8) {
+                    ScrollView {
+                        Text(text)
+                            .font(.system(.body, design: .monospaced))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
+                    }
                 } else {
                     VStack(spacing: 20) {
                         Image(systemName: "doc.text")

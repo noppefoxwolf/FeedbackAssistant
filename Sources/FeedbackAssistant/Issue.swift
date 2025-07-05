@@ -5,6 +5,7 @@ public struct SystemInfo: Codable, Sendable {
     public let appVersion: String
     public let appBuildNumber: String
     public let bundleIdentifier: String
+    public let systemVersion: String
     public let deviceModel: String
     public let deviceName: String
     public let systemName: String
