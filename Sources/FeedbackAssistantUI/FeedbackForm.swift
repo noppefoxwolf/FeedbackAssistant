@@ -17,15 +17,15 @@ class FeedbackViewModel {
         self.feedback = initialFeedback
     }
     
-    func addAttachment(_ attachment: Attachment) {
-        feedback.addAttachment(attachment)
+    func attach(_ attachment: Attachment) {
+        feedback.attach(attachment)
     }
     
-    func removeAttachment(_ attachment: Attachment) {
-        feedback.removeAttachment(attachment)
+    func detach(_ attachment: Attachment) {
+        feedback.detach(attachment)
     }
     
-    func createTempFileForQuickLook(_ attachment: Attachment) -> URL? {
+    func makeTempFile(for attachment: Attachment) -> URL? {
         let tempURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(attachment.name)
         
@@ -39,18 +39,18 @@ class FeedbackViewModel {
     }
 }
 
-public struct FeedbackAssistantView: View {
+public struct FeedbackForm: View {
     @Environment(\.dismiss)
     private var dismiss
     @State private var viewModel: FeedbackViewModel
     
-    private let submissionHandler: FeedbackSubmissionProtocol
+    private let submitter: FeedbackSubmitting
     
     public init(
-        submissionHandler: FeedbackSubmissionProtocol,
+        submitter: FeedbackSubmitting,
         initialFeedback: Feedback = Feedback()
     ) {
-        self.submissionHandler = submissionHandler
+        self.submitter = submitter
         self._viewModel = State(initialValue: FeedbackViewModel(initialFeedback: initialFeedback))
     }
     
@@ -81,11 +81,11 @@ public struct FeedbackAssistantView: View {
     }
     
     
-    private func submitFeedback() async {
+    private func submit() async {
         viewModel.isSubmitting = true
         
         do {
-            try await submissionHandler.submitFeedback(viewModel.feedback)
+            try await submitter.submit(viewModel.feedback)
             dismiss()
         } catch {
             print("Error submitting feedback: \(error)")
@@ -181,11 +181,11 @@ public struct FeedbackAssistantView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            viewModel.selectedAttachmentURL = viewModel.createTempFileForQuickLook(attachment)
+            viewModel.selectedAttachmentURL = viewModel.makeTempFile(for: attachment)
         }
         .swipeActions(edge: .trailing) {
             Button(String(localized: "Delete", bundle: .module), role: .destructive) {
-                viewModel.removeAttachment(attachment)
+                viewModel.detach(attachment)
             }
         }
     }
@@ -201,7 +201,7 @@ public struct FeedbackAssistantView: View {
         ToolbarItem(placement: .navigationBarTrailing) {
             Button(String(localized: "Submit", bundle: .module)) {
                 Task {
-                    await submitFeedback()
+                    await submit()
                 }
             }
             .disabled(viewModel.feedback.title.isEmpty || viewModel.feedback.description.isEmpty || viewModel.isSubmitting)
@@ -228,7 +228,7 @@ public struct FeedbackAssistantView: View {
                     data: imageData,
                     contentType: .png
                 )
-                viewModel.addAttachment(attachment)
+                viewModel.attach(attachment)
             }
         }
     }
@@ -246,7 +246,7 @@ public struct FeedbackAssistantView: View {
                     data: data,
                     contentType: contentType
                 )
-                viewModel.addAttachment(attachment)
+                viewModel.attach(attachment)
             } catch {
                 print("Error loading file: \(error)")
             }
@@ -342,16 +342,16 @@ struct DocumentPicker: UIViewControllerRepresentable {
     }
 }
 
-struct MockFeedbackSubmissionHandler: FeedbackSubmissionProtocol {
-    func submitFeedback(_ feedback: Feedback) async throws {
+struct MockFeedbackSubmitter: FeedbackSubmitting {
+    func submit(_ feedback: Feedback) async throws {
         try await Task.sleep(nanoseconds: 1_000_000_000)
         print("Mock submission: \(feedback.title)")
     }
 }
 
 #Preview {
-    FeedbackAssistantView(
-        submissionHandler: MockFeedbackSubmissionHandler(),
+    FeedbackForm(
+        submitter: MockFeedbackSubmitter(),
         initialFeedback: Feedback(
             title: "Example Feedback",
             description: "This is a pre-filled feedback for testing",

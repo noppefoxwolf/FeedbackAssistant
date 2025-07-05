@@ -80,12 +80,12 @@ public struct Feedback: Codable, Identifiable, Sendable {
         updatedAt = Date()
     }
     
-    public mutating func addAttachment(_ attachment: Attachment) {
+    public mutating func attach(_ attachment: Attachment) {
         attachments.append(attachment)
         updatedAt = Date()
     }
     
-    public mutating func removeAttachment(_ attachment: Attachment) {
+    public mutating func detach(_ attachment: Attachment) {
         attachments.removeAll { $0.id == attachment.id }
         updatedAt = Date()
     }

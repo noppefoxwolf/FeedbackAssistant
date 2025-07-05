@@ -18,8 +18,8 @@ struct ContentView: View {
             .buttonStyle(.borderedProminent)
         }
         .sheet(isPresented: $showingFeedback) {
-            FeedbackAssistantView(
-                submissionHandler: MockFeedbackSubmissionHandler(),
+            FeedbackForm(
+                submitter: MockFeedbackSubmitter(),
                 initialFeedback: createFeedbackWithScreenshot()
             )
         }
@@ -32,18 +32,18 @@ struct ContentView: View {
     private func createFeedbackWithScreenshot() -> Feedback {
         var attachments: [Attachment] = []
         
-        if let screenshotAttachment = captureScreenshotAttachment() {
+        if let screenshotAttachment = makeScreenshotAttachment() {
             attachments.append(screenshotAttachment)
         }
         
-        if let hierarchyAttachment = viewHierarchyAttachment() {
+        if let hierarchyAttachment = makeViewHierarchyAttachment() {
             attachments.append(hierarchyAttachment)
         }
         
         return Feedback(attachments: attachments)
     }
     
-    private func captureScreenshotAttachment() -> Attachment? {
+    private func makeScreenshotAttachment() -> Attachment? {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first else {
             return nil
@@ -65,7 +65,7 @@ struct ContentView: View {
         )
     }
     
-    private func viewHierarchyAttachment() -> Attachment? {
+    private func makeViewHierarchyAttachment() -> Attachment? {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first else {
             return nil
@@ -82,8 +82,8 @@ struct ContentView: View {
     }
 }
 
-struct MockFeedbackSubmissionHandler: FeedbackSubmissionProtocol {
-    func submitFeedback(_ feedback: Feedback) async throws {
+struct MockFeedbackSubmitter: FeedbackSubmitting {
+    func submit(_ feedback: Feedback) async throws {
         try await Task.sleep(nanoseconds: 1_000_000_000)
         print("Mock submission: \(feedback.title)")
     }
