@@ -12,10 +12,24 @@
       }
     },
     "App crashes when tapping share" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共有ボタンをタップするとアプリがクラッシュ"
+          }
+        }
+      }
     },
     "App Version" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリバージョン"
+          }
+        }
+      }
     },
     "Attachments" : {
       "localizations" : {
@@ -38,13 +52,34 @@
       }
     },
     "Build Number" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ビルド番号"
+          }
+        }
+      }
     },
     "Bundle ID" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バンドルID"
+          }
+        }
+      }
     },
     "Cancel" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンセル"
+          }
+        }
+      }
     },
     "Close" : {
       "localizations" : {
@@ -57,23 +92,44 @@
       }
     },
     "Delete" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除"
+          }
+        }
+      }
     },
     "Description" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "説明"
+            "value" : "詳細"
           }
         }
       }
     },
     "Device Model" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デバイスモデル"
+          }
+        }
+      }
     },
     "Device Name" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デバイス名"
+          }
+        }
+      }
     },
     "Enter a title that describes your feedback" : {
       "localizations" : {
@@ -106,13 +162,34 @@
       }
     },
     "Files" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル"
+          }
+        }
+      }
     },
     "iOS Version" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOSバージョン"
+          }
+        }
+      }
     },
     "Photo Library" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォトライブラリ"
+          }
+        }
+      }
     },
     "Please enter the problem and steps to reproduce it" : {
       "localizations" : {
@@ -135,10 +212,24 @@
       }
     },
     "System Information" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システム情報"
+          }
+        }
+      }
     },
     "Tap share → app crashes" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共有をタップ → アプリがクラッシュ"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

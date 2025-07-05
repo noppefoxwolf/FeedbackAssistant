@@ -2,19 +2,59 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Bug Report" : {
-      "comment" : "Bug report feedback type"
+      "comment" : "Bug report feedback type",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バグ報告"
+          }
+        }
+      }
     },
     "Feature Request" : {
-      "comment" : "Feature request feedback type"
+      "comment" : "Feature request feedback type",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "機能要望"
+          }
+        }
+      }
     },
     "Other" : {
-      "comment" : "Other feedback type"
+      "comment" : "Other feedback type",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その他"
+          }
+        }
+      }
     },
     "Performance Issue" : {
-      "comment" : "Performance issue feedback type"
+      "comment" : "Performance issue feedback type",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パフォーマンスの問題"
+          }
+        }
+      }
     },
     "Usability Issue" : {
-      "comment" : "Usability issue feedback type"
+      "comment" : "Usability issue feedback type",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ユーザビリティの問題"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
