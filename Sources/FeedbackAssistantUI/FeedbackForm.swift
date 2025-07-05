@@ -113,7 +113,7 @@ public struct FeedbackForm: View {
     }
     
     private var descriptionSection: some View {
-        Section(String(localized: "Description", bundle: .module)) {
+        Section("Description") {
             FormFieldView(
                 title: String(localized: "Please enter the problem and steps to reproduce it", bundle: .module),
                 placeholder: String(localized: "Tap share → app crashes", bundle: .module),
@@ -124,7 +124,7 @@ public struct FeedbackForm: View {
     }
     
     private var systemInformationSection: some View {
-        Section(String(localized: "System Information", bundle: .module)) {
+        Section("System Information") {
             VStack(alignment: .leading, spacing: 8) {
                 SystemInfoRow(label: String(localized: "App Version", bundle: .module), value: viewModel.feedback.systemInfo.appVersion)
                 SystemInfoRow(label: String(localized: "Build Number", bundle: .module), value: viewModel.feedback.systemInfo.appBuildNumber)
@@ -139,7 +139,7 @@ public struct FeedbackForm: View {
     }
     
     private var attachmentsSection: some View {
-        Section(String(localized: "Attachments", bundle: .module)) {
+        Section("Attachments") {
             Button(String(localized: "Add Attachment", bundle: .module)) {
                 viewModel.showingActionSheet = true
             }
