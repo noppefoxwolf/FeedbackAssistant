@@ -1,6 +1,7 @@
 import SwiftUI
 import FeedbackAssistant
 import QuickLook
+import _QuickLook_SwiftUI
 import Observation
 
 @Observable
@@ -12,6 +13,8 @@ class FeedbackViewModel {
     var showingDocumentPicker = false
     var showingActionSheet = false
     var selectedAttachmentURL: URL?
+    var showingErrorAlert = false
+    var errorMessage = ""
     
     init(initialFeedback: Feedback = Feedback()) {
         self.feedback = initialFeedback
@@ -77,6 +80,13 @@ public struct FeedbackForm: View {
                 documentPickerSheet
             }
             .quickLookPreview($viewModel.selectedAttachmentURL)
+            .alert(String(localized: "Error", bundle: .module), isPresented: $viewModel.showingErrorAlert) {
+                Button(String(localized: "OK", bundle: .module)) {
+                    viewModel.showingErrorAlert = false
+                }
+            } message: {
+                Text(viewModel.errorMessage)
+            }
         }
     }
     
@@ -88,7 +98,8 @@ public struct FeedbackForm: View {
             try await submitter.submit(viewModel.feedback)
             dismiss()
         } catch {
-            print("Error submitting feedback: \(error)")
+            viewModel.errorMessage = error.localizedDescription
+            viewModel.showingErrorAlert = true
             viewModel.isSubmitting = false
         }
     }
