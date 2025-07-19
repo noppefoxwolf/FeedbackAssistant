@@ -58,35 +58,33 @@ public struct FeedbackForm: View {
     }
     
     public var body: some View {
-        NavigationView {
-            List {
-                basicInformationSection
-                descriptionSection
-                systemInformationSection
-                attachmentsSection
+        List {
+            basicInformationSection
+            descriptionSection
+            systemInformationSection
+            attachmentsSection
+        }
+        .navigationTitle(String(localized: "Feedback", bundle: .module))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            toolbarContent
+        }
+        .confirmationDialog(String(localized: "Add Attachment", bundle: .module), isPresented: $viewModel.showingActionSheet) {
+            attachmentDialogContent
+        }
+        .sheet(isPresented: $viewModel.showingImagePicker) {
+            imagePickerSheet
+        }
+        .sheet(isPresented: $viewModel.showingDocumentPicker) {
+            documentPickerSheet
+        }
+        .quickLookPreview($viewModel.selectedAttachmentURL)
+        .alert(String(localized: "Error", bundle: .module), isPresented: $viewModel.showingErrorAlert) {
+            Button(String(localized: "OK", bundle: .module)) {
+                viewModel.showingErrorAlert = false
             }
-            .navigationTitle(String(localized: "Feedback", bundle: .module))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                toolbarContent
-            }
-            .confirmationDialog(String(localized: "Add Attachment", bundle: .module), isPresented: $viewModel.showingActionSheet) {
-                attachmentDialogContent
-            }
-            .sheet(isPresented: $viewModel.showingImagePicker) {
-                imagePickerSheet
-            }
-            .sheet(isPresented: $viewModel.showingDocumentPicker) {
-                documentPickerSheet
-            }
-            .quickLookPreview($viewModel.selectedAttachmentURL)
-            .alert(String(localized: "Error", bundle: .module), isPresented: $viewModel.showingErrorAlert) {
-                Button(String(localized: "OK", bundle: .module)) {
-                    viewModel.showingErrorAlert = false
-                }
-            } message: {
-                Text(viewModel.errorMessage)
-            }
+        } message: {
+            Text(viewModel.errorMessage)
         }
     }
     
@@ -361,19 +359,21 @@ struct MockFeedbackSubmitter: FeedbackSubmitting {
 }
 
 #Preview {
-    FeedbackForm(
-        submitter: MockFeedbackSubmitter(),
-        initialFeedback: Feedback(
-            title: "Example Feedback",
-            description: "This is a pre-filled feedback for testing",
-            type: .bug,
-            attachments: [
-                Attachment(
-                    name: "screenshot.png",
-                    data: Data(),
-                    contentType: .png
-                )
-            ]
+    NavigationView {
+        FeedbackForm(
+            submitter: MockFeedbackSubmitter(),
+            initialFeedback: Feedback(
+                title: "Example Feedback",
+                description: "This is a pre-filled feedback for testing",
+                type: .bug,
+                attachments: [
+                    Attachment(
+                        name: "screenshot.png",
+                        data: Data(),
+                        contentType: .png
+                    )
+                ]
+            )
         )
-    )
+    }
 }

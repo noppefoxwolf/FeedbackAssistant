@@ -51,9 +51,11 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $showingFeedback) {
-            FeedbackForm(
-                submitter: YourFeedbackSubmitter()
-            )
+            NavigationView {
+                FeedbackForm(
+                    submitter: YourFeedbackSubmitter()
+                )
+            }
         }
     }
 }
@@ -76,10 +78,12 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $showingFeedback) {
-            FeedbackForm(
-                submitter: YourFeedbackSubmitter(),
-                initialFeedback: createFeedbackWithAttachments()
-            )
+            NavigationView {
+                FeedbackForm(
+                    submitter: YourFeedbackSubmitter(),
+                    initialFeedback: createFeedbackWithAttachments()
+                )
+            }
         }
     }
     
@@ -182,6 +186,9 @@ public struct FeedbackForm: View {
 **Parameters:**
 - `submitter`: Object conforming to `FeedbackSubmitting` protocol
 - `initialFeedback`: Pre-populated feedback data (optional)
+
+**Usage Note:**
+You must wrap `FeedbackForm` in a `NavigationView` when presenting it, as the component relies on navigation features like toolbar items and navigation title.
 
 **Features:**
 - 📝 Form fields for title and description
