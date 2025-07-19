@@ -24,7 +24,7 @@ Add the following to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/noppefoxwolf/FeedbackAssistant.git", from: "0.0.2")
+    .package(url: "https://github.com/noppefoxwolf/FeedbackAssistant.git", from: "0.0.6")
 ]
 ```
 
